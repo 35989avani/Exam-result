@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Exam Results Dashboard</h1>
+    
+    <div class="metrics">
+        <div class="metric">
+            <h2>Pass Rate</h2>
+            <p>{{ "%.2f"|format(pass_rate) }}%</p>
+        </div>
+        <div class="metric">
+            <h2>Fail Rate</h2>
+            <p>{{ "%.2f"|format(fail_rate) }}%</p>
+        </div>
+    </div>
+    
+    <div class="charts">
+        <div class="chart-container">
+            <h2>Subject Averages</h2>
+            <canvas id="subjectChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Pass/Fail Distribution</h2>
+            <canvas id="passFailChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Trends Over Time</h2>
+            <canvas id="trendChart"></canvas>
+        </div>
+    </div>
+    
+    <h2>Student Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Math</th>
+                <th>Science</th>
+                <th>English</th>
+                <th>History</th>
+                <th>Average</th>
+                <th>Pass/Fail</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.Student }}</td>
+                <td>{{ student.Math }}</td>
+                <td>{{ student.Science }}</td>
+                <td>{{ student.English }}</td>
+                <td>{{ student.History }}</td>
+                <td>{{ "%.2f"|format(student.Average) }}</td>
+                <td>{{ 'Pass' if student.Pass else 'Fail' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <script>
+        var subjectAverages = JSON.parse('{{ subject_averages | tojson }}');
+        var passRate = {{ pass_rate }};
+        var failRate = {{ fail_rate }};
+        var trends = JSON.parse('{{ trends | tojson }}');
+    </script>
+    <script>
+        // Subject Averages Bar Chart
+        const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+        new Chart(subjectCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Math', 'Science', 'English', 'History'],
+                datasets: [{
+                    label: 'Average Score',
+                    data: [subjectAverages.Math, subjectAverages.Science, subjectAverages.English, subjectAverages.History],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        // Pass/Fail Pie Chart
+        const passFailCtx = document.getElementById('passFailChart').getContext('2d');
+        new Chart(passFailCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Pass', 'Fail'],
+                datasets: [{
+                    data: [passRate, failRate],
+                    backgroundColor: ['#4CAF50', '#F44336']
+                }]
+            }
+        });
+        
+        // Trends Line Chart
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        const dates = Object.keys(trends);
+        const averages = Object.values(trends);
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: 'Average Score',
+                    data: averages,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
