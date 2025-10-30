@@ -1,0 +1,5 @@
+- [x] Create requirements.txt with Flask and pandas
+- [x] Create app.py: Flask app to read CSV, compute metrics (subject averages, pass/fail rates, trends by date), render HTML template
+- [x] Create templates/index.html: HTML with sections for metrics, tables, and Chart.js charts (bar for subjects, line for trends, pie for pass/fail)
+- [x] Create static/css/style.css: Simple CSS for dashboard layout and styling
+- [ ] Test by running the app and viewing in browser
